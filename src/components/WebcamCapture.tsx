@@ -54,16 +54,8 @@ export const WebcamCapture = () => {
         context.drawImage(videoRef.current, 0, 0);
         
         try {
-          // Convert canvas to blob
-          const blob = await new Promise<Blob>((resolve) => 
-            canvasRef.current!.toBlob((blob) => resolve(blob!), 'image/jpeg')
-          );
-          
-          // Create a File object from the blob
-          const imageFile = new File([blob], 'frame.jpg', { type: 'image/jpeg' });
-          
-          // Perform detection using the File object
-          const results = await detector(imageFile);
+          // Use the canvas element directly for detection
+          const results = await detector(canvasRef.current);
           
           // Draw boxes around detected faces
           results.forEach((detection: any) => {
