@@ -12,9 +12,7 @@ export const WebcamCapture = () => {
   useEffect(() => {
     const initializeDetector = async () => {
       try {
-        const detect = await pipeline('object-detection', 'Xenova/detr-resnet-50', {
-          revision: 'main'
-        });
+        const detect = await pipeline('object-detection', 'Xenova/detr-resnet-50');
         setDetector(detect);
       } catch (error) {
         console.error('Failed to initialize detector:', error);
@@ -56,11 +54,16 @@ export const WebcamCapture = () => {
         context.drawImage(videoRef.current, 0, 0);
         
         try {
-          // Get canvas data as base64 URL
-          const imageData = canvasRef.current.toDataURL('image/jpeg');
+          // Convert canvas to blob
+          const blob = await new Promise<Blob>((resolve) => 
+            canvasRef.current!.toBlob((blob) => resolve(blob!), 'image/jpeg')
+          );
           
-          // Perform detection using the base64 image data
-          const results = await detector(imageData);
+          // Create a File object from the blob
+          const imageFile = new File([blob], 'frame.jpg', { type: 'image/jpeg' });
+          
+          // Perform detection using the File object
+          const results = await detector(imageFile);
           
           // Draw boxes around detected faces
           results.forEach((detection: any) => {
