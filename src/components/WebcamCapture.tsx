@@ -54,11 +54,19 @@ export const WebcamCapture = () => {
         context.drawImage(videoRef.current, 0, 0);
         
         try {
-          // Convert canvas to base64 string
-          const base64Image = canvasRef.current.toDataURL('image/jpeg');
+          // Convert canvas to blob
+          const blob = await new Promise<Blob>((resolve) => 
+            canvasRef.current!.toBlob((blob) => resolve(blob!), 'image/jpeg')
+          );
           
-          // Perform detection using the base64 string
-          const results = await detector(base64Image);
+          // Create a URL from the blob
+          const imageUrl = URL.createObjectURL(blob);
+          
+          // Perform detection using the URL
+          const results = await detector(imageUrl);
+          
+          // Clean up the URL after detection
+          URL.revokeObjectURL(imageUrl);
           
           // Draw boxes around detected faces
           results.forEach((detection: any) => {
