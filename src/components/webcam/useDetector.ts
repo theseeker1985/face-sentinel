@@ -8,7 +8,6 @@ export const useDetector = () => {
     const initializeDetector = async () => {
       try {
         const detect = await pipeline('object-detection', 'Xenova/detr-resnet-50', {
-          quantized: false,
           revision: 'main'
         });
         setDetector(() => async (image: string) => {
