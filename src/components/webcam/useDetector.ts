@@ -7,8 +7,13 @@ export const useDetector = () => {
   useEffect(() => {
     const initializeDetector = async () => {
       try {
-        const detect = await pipeline('object-detection', 'Xenova/detr-resnet-50');
-        setDetector(detect);
+        const detect = await pipeline('object-detection', 'Xenova/detr-resnet-50', {
+          quantized: false,
+          revision: 'main'
+        });
+        setDetector(() => async (image: string) => {
+          return await detect(image);
+        });
       } catch (error) {
         console.error('Failed to initialize detector:', error);
       }
