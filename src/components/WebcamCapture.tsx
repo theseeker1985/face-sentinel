@@ -11,8 +11,15 @@ export const WebcamCapture = () => {
 
   useEffect(() => {
     const initializeDetector = async () => {
-      const detect = await pipeline('object-detection', 'Xenova/detr-resnet-50');
-      setDetector(detect);
+      try {
+        const detect = await pipeline('object-detection', 'Xenova/detr-resnet-50', {
+          quantized: false,
+          revision: 'main'
+        });
+        setDetector(detect);
+      } catch (error) {
+        console.error('Failed to initialize detector:', error);
+      }
     };
     initializeDetector();
   }, []);
