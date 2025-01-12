@@ -54,8 +54,11 @@ export const WebcamCapture = () => {
         context.drawImage(videoRef.current, 0, 0);
         
         try {
-          // Use the canvas element directly for detection
-          const results = await detector(canvasRef.current);
+          // Convert canvas to base64 string
+          const base64Image = canvasRef.current.toDataURL('image/jpeg');
+          
+          // Perform detection using the base64 string
+          const results = await detector(base64Image);
           
           // Draw boxes around detected faces
           results.forEach((detection: any) => {
