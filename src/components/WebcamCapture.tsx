@@ -39,21 +39,23 @@ export const WebcamCapture = () => {
         context.drawImage(videoRef.current, 0, 0);
         
         try {
-          const blob = await new Promise<Blob>((resolve) => 
-            canvasRef.current!.toBlob((blob) => resolve(blob!), 'image/jpeg')
-          );
+          const dataUrl = canvasRef.current.toDataURL('image/jpeg');
+          const results = await detector(dataUrl);
           
-          const imageUrl = URL.createObjectURL(blob);
-          const results = await detector(imageUrl);
-          URL.revokeObjectURL(imageUrl);
-          
-          results.forEach((detection: any) => {
-            if (detection.label === 'person') {
-              const [x, y, width, height] = detection.box;
-              context.strokeStyle = '#3498db';
-              context.lineWidth = 2;
-              context.strokeRect(x, y, width, height);
-            }
+          results.forEach((detection) => {
+            const { xmin, ymin, xmax, ymax } = detection.box;
+            const width = xmax - xmin;
+            const height = ymax - ymin;
+            
+            context.strokeStyle = '#3498db';
+            context.lineWidth = 2;
+            context.strokeRect(xmin, ymin, width, height);
+            
+            // Draw label
+            context.fillStyle = '#3498db';
+            context.fillRect(xmin, ymin - 20, context.measureText(detection.label).width + 10, 20);
+            context.fillStyle = 'white';
+            context.fillText(detection.label, xmin + 5, ymin - 5);
           });
         } catch (error) {
           console.error('Detection error:', error);
